@@ -74,3 +74,7 @@ def main():
 
 if __name__== "__main__" :
   main()
+
+
+
+# References: https://www.vitoshacademy.com/python-algorithms-stable-matching-problem/, https://en.wikipedia.org/wiki/Gale–Shapley_algorithm
