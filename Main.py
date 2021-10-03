@@ -47,7 +47,7 @@ def main():
   with open("entradaProj2TAG.txt") as f:
     lines = f.read().strip().split("\n")
 
-  empty_projects = []
+  projects_without_maximum = []
   assigned_students = []
   students_without_project = []
   projects_graph, students_graph = assemble(lines)      # reads the input file
@@ -58,8 +58,8 @@ def main():
     id = project["id"]
     participants = project["participants"]
 
-    if participants == []:
-      empty_projects.append(project["id"])
+    if len(participants) < int(project["vacancies"]):
+      projects_without_maximum.append(project["id"])
 
     print(f"[{id}]: {participants}")
 
@@ -68,7 +68,7 @@ def main():
     if student not in assigned_students:
       students_without_project.append(student["id"])
 
-  print(f"\nProjetos vazios:{empty_projects}")
+  print(f"\nProjetos que não atingiram a quantidade máxima de participantes:{projects_without_maximum}")
   print(f"\nAlunos sem projeto:{students_without_project}")
 
 
