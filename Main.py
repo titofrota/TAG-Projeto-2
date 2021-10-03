@@ -7,15 +7,14 @@
 
 from Initializer import assemble
 
-def gale_sharpley(projects_graph, students_graph):
-  assigned_students = []
+def gale_shapley(projects_graph, students_graph, assigned_students):
   s_count = 1
 
   while (True):
     for student in students_graph:
       if (len(student["attempts"]) == 3):       # checks if student has tried all his attempts
         s_count += 1
-        if (s_count == len(students_graph)): return projects_graph, students_graph    # stops when everyone was checked 
+        if (s_count == (len(students_graph)*10)): return projects_graph, students_graph, assigned_students    # stops when everyone was checked 
 
       for preference in student["preferences"]:
         if student not in assigned_students:      # checks if student wasnt assigned to a project
@@ -28,33 +27,50 @@ def gale_sharpley(projects_graph, students_graph):
               attempt["participants"].append(student["id"])     # assigns the student as a participant
               assigned_students.append(student)             # inserts the student on the assigned students list
 
+          else:
+            # substitution algorithm
+            for participant in attempt["participants"]:
+              selected_participant = next(item for item in students_graph if item["id"] == participant)     # gets the selected participant
+
+              if(student["grade"] > selected_participant["grade"]) and (student != selected_participant):         # if the current student grade is greather than the selected participants grade
+                assigned_students.remove(selected_participant)              # removes the selected participant
+                attempt["participants"].remove(selected_participant["id"])
+
+                attempt["participants"].append(student["id"])     # assigns the student as a participant
+                assigned_students.append(student)             # inserts the student on the assigned students list
+                break
+                
+
 
 
 def main():
   with open("entradaProj2TAG.txt") as f:
     lines = f.read().strip().split("\n")
 
-  projects_graph, students_graph = assemble(lines)
+  empty_projects = []
+  assigned_students = []
+  students_without_project = []
+  projects_graph, students_graph = assemble(lines)      # reads the input file
+  gale_shapley(projects_graph, students_graph, assigned_students)
 
-  # for student in students_graph:
-  #   print(student)
-
-  # for project in projects_graph:
-  #   print(project)
-
-  gale_sharpley(projects_graph, students_graph)
-
-  # projects_graph[1]["participants"].append(students_graph[1])
-  # if students_graph[1] in projects_graph[1]["participants"]: print(projects_graph[1])
-
-  # a = next(item for item in projects_graph if item["id"] == "P35")
-  # print(next(item for item in projects_graph if item["id"] == "P35")["participants"])
-
+  # projects output
   for project in projects_graph:
     id = project["id"]
     participants = project["participants"]
 
+    if participants == []:
+      empty_projects.append(project["id"])
+
     print(f"[{id}]: {participants}")
+
+  # non assigned students output
+  for student in students_graph:
+    if student not in assigned_students:
+      students_without_project.append(student["id"])
+
+  print(f"\nProjetos vazios:{empty_projects}")
+  print(f"\nAlunos sem projeto:{students_without_project}")
+
 
 if __name__== "__main__" :
   main()
