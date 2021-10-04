@@ -17,15 +17,16 @@ def gale_shapley(projects_graph, students_graph, assigned_students):
         if (s_count == (len(students_graph)*10)): return projects_graph, students_graph, assigned_students    # stops when everyone was checked 
 
       for preference in student["preferences"]:
+        if preference not in student["attempts"]: student["attempts"].append(preference)      # inserts the current preference in the attempts
+        attempt = next(item for item in projects_graph if item["id"] == preference)     # gets the selected project
+
         if student not in assigned_students:      # checks if student wasnt assigned to a project
-          if preference not in student["attempts"]: student["attempts"].append(preference)
-
-          attempt = next(item for item in projects_graph if item["id"] == preference)     # gets the selected project
-
           if len(attempt["participants"]) != int(attempt["vacancies"]):     # checks if the project isnt full
-            if((student["grade"] >= attempt["minimum_grade"]) and student not in assigned_students):        # checks if the student has the minimum grade
+            if(student["grade"] >= attempt["minimum_grade"]):        # checks if the student has the minimum grade
               attempt["participants"].append(student["id"])     # assigns the student as a participant
+              student["assigned_to"] = attempt["id"]
               assigned_students.append(student)             # inserts the student on the assigned students list
+              # print(f"{student}\n")
 
           else:
             # substitution algorithm
@@ -39,6 +40,34 @@ def gale_shapley(projects_graph, students_graph, assigned_students):
                 attempt["participants"].append(student["id"])     # assigns the student as a participant
                 assigned_students.append(student)             # inserts the student on the assigned students list
                 break
+        # substitution algorithm for already assigned students
+        else:
+          for proj in projects_graph:             # gets currently assigned project
+            if proj["id"] in student["assigned_to"]:
+              current_project = proj
+              break
+
+          if current_project != attempt:
+            if (int(attempt["minimum_grade"]) > int(current_project["minimum_grade"])):       # checks if the minimum grade on the attempt is greater than the currently assigned
+              if len(attempt["participants"]) == int(attempt["vacancies"]):           # checks if the attempt project is full
+                # substitution algorithm
+                for participant in attempt["participants"]:
+                  selected_participant = next(item for item in students_graph if item["id"] == participant)     # gets the selected participant
+
+                  if(student["grade"] > selected_participant["grade"]):         # if the current student grade is greather than the selected participants grade
+                    assigned_students.remove(selected_participant)              # removes the selected participant
+                    attempt["participants"].remove(selected_participant["id"])
+
+                    attempt["participants"].append(student["id"])     # assigns the student as a participant
+                    assigned_students.append(student)
+                    break 
+
+              else:                 # if the attempt project isnt full
+                if student["id"] in current_project["participants"]:
+                  current_project["participants"].remove(student["id"])
+                  attempt["participants"].append(student["id"])
+               
+          
                 
 
 

@@ -18,7 +18,7 @@ def assemble(lines):
         subject = re.search("\((\w+)\):\((\w+), (\w+), (\w+)\)(|\ )\((\w+)\)", line)        # splits the student data
         student_id = subject.group(1); preferences = [subject.group(2), subject.group(3), subject.group(4)]; grade = subject.group(6)       # gets the project data
 
-        student = {"id": student_id, "preferences": preferences, "grade": grade, "attempts": []}        # assigns the data
+        student = {"id": student_id, "preferences": preferences, "grade": grade, "attempts": [], "assigned_to": ""}        # assigns the data
 
         students_graph.append(student)
 
