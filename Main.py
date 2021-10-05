@@ -9,8 +9,17 @@ from Initializer import assemble
 
 def gale_shapley(projects_graph, students_graph, assigned_students):
   s_count = 1
+  iterations_count = 0
 
   while (True):
+    if iterations_count <= 10 and iterations_count > 0:        # prints the first 10 iterations
+      print(f"\nIteração nº {iterations_count}")
+      for project in projects_graph:
+        id = project["id"]
+        participants = project["participants"]
+
+        print(f"[{id}]: {participants}")
+
     for student in students_graph:
       if (len(student["attempts"]) == 3):       # checks if student has tried all his attempts
         s_count += 1
@@ -66,10 +75,8 @@ def gale_shapley(projects_graph, students_graph, assigned_students):
                 if student["id"] in current_project["participants"]:
                   current_project["participants"].remove(student["id"])
                   attempt["participants"].append(student["id"])
-               
-          
-                
-
+                  
+    iterations_count += 1
 
 
 def main():
@@ -83,13 +90,13 @@ def main():
   gale_shapley(projects_graph, students_graph, assigned_students)
 
   # projects output
+  print("\n\n\nOUTPUT FINAL:")
   for project in projects_graph:
     id = project["id"]
     participants = project["participants"]
 
     if len(participants) < int(project["vacancies"]):
       projects_without_maximum.append(project["id"])
-
     print(f"[{id}]: {participants}")
 
   # non assigned students output
